@@ -25,6 +25,7 @@ export class InputManager {
       right: this.inputMap["d"] || false,
       jump: this.inputMap[" "] || false,
       run: this.inputMap["shift"] || false,
+      attack: this.inputMap["e"] || false,
     };
   }
 

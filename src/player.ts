@@ -18,6 +18,9 @@ export class PlayerController {
   private scene: Scene;
   private camera: ArcRotateCamera;
   private currentAnim: AnimationGroup | null = null;
+  private attackCallback: ((position: Vector3, direction: Vector3) => void) | null = null;
+  private attackCooldown = 0;
+  private targetPosition: Vector3 | null = null;
 
   // Reusable vectors for performance
   private readonly cameraForward = Vector3.Zero();
@@ -34,6 +37,14 @@ export class PlayerController {
     this.scene = scene;
     this.camera = camera;
     this.player = this.initializePlayer(playerMesh, animations);
+  }
+
+  setAttackCallback(callback: (position: Vector3, direction: Vector3) => void): void {
+    this.attackCallback = callback;
+  }
+
+  setTarget(targetPosition: Vector3 | null): void {
+    this.targetPosition = targetPosition;
   }
 
   private initializePlayer(
@@ -98,12 +109,22 @@ export class PlayerController {
     const currentVel = this.player.body.getLinearVelocity() || Vector3.Zero();
     const yVel = currentVel.y;
 
+    // Update cooldowns
+    if (this.attackCooldown > 0) {
+      this.attackCooldown -= deltaTime;
+    }
+
     // Grounded = Y velocity near zero (simple and accurate)
     const isGrounded = Math.abs(yVel) < 0.5;
     this.player.isGrounded = isGrounded;
 
     // Update camera direction vectors
     this.updateCameraDirections();
+
+    // Handle attack
+    if (input.attack && this.attackCooldown <= 0 && this.player.isGrounded) {
+      this.attack();
+    }
 
     // Calculate movement
     this.calculateMovementDirection(input);
@@ -117,6 +138,38 @@ export class PlayerController {
 
     // Camera
     this.updateCamera();
+  }
+
+  private attack(): void {
+    // No target selected
+    if (!this.targetPosition) return;
+
+    this.attackCooldown = 0.5; // Half second cooldown
+
+    // Shoot position from chest height
+    const shootPos = this.player.capsule.position.add(new Vector3(0, 0.8, 0));
+
+    // Calculate direction to target
+    const direction = this.targetPosition.subtract(shootPos).normalize();
+
+    // Play attack animation if available
+    const attackAnim = this.player.animations.get("attack");
+    if (attackAnim) {
+      attackAnim.stop();
+      attackAnim.start(false); // Play once
+
+      // Wait for animation to finish, then shoot fireball
+      attackAnim.onAnimationGroupEndObservable.addOnce(() => {
+        if (this.attackCallback) {
+          this.attackCallback(shootPos, direction);
+        }
+      });
+    } else {
+      // No animation, shoot immediately
+      if (this.attackCallback) {
+        this.attackCallback(shootPos, direction);
+      }
+    }
   }
 
   private updateCameraDirections(): void {

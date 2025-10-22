@@ -29,6 +29,7 @@ export interface InputState {
   right: boolean;
   jump: boolean;
   run: boolean;
+  attack: boolean;
 }
 
 export interface MovementData {
