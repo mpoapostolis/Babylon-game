@@ -1,4 +1,5 @@
 import type { DialogueLine } from "./npc";
+import type { SoundManager } from "./soundManager";
 
 export class DialogueUI {
   private container: HTMLElement;
@@ -8,6 +9,7 @@ export class DialogueUI {
   private closeButton: HTMLElement;
   private isVisible = false;
   private closeCallback: (() => void) | null = null;
+  private soundManager: SoundManager | null = null;
 
   constructor() {
     this.container = document.getElementById("dialogue-container")!;
@@ -25,22 +27,41 @@ export class DialogueUI {
     });
   }
 
+  setSoundManager(soundManager: SoundManager): void {
+    this.soundManager = soundManager;
+  }
+
   setCloseCallback(callback: () => void): void {
     this.closeCallback = callback;
   }
 
   show(dialogue: DialogueLine): void {
+    const wasVisible = this.isVisible;
     this.speakerElement.textContent = dialogue.speaker;
     this.textElement.textContent = dialogue.text;
     this.container.classList.remove("hidden");
     this.container.classList.add("flex");
     this.isVisible = true;
+
+    // Play sound - open if first time, advance if continuing
+    if (this.soundManager) {
+      if (!wasVisible) {
+        this.soundManager.play("dialogueOpen");
+      } else {
+        this.soundManager.play("dialogueAdvance");
+      }
+    }
   }
 
   hide(): void {
     this.container.classList.add("hidden");
     this.container.classList.remove("flex");
     this.isVisible = false;
+
+    // Play close sound
+    if (this.soundManager) {
+      this.soundManager.play("dialogueClose");
+    }
   }
 
   showPrompt(npcName: string): void {

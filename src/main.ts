@@ -7,6 +7,7 @@ import { CombatSystem } from "./combat";
 import { HUD } from "./hud";
 import { NPC } from "./npc";
 import { DialogueUI } from "./dialogue";
+import { SoundManager } from "./soundManager";
 
 async function createEngine(canvas: HTMLCanvasElement): Promise<Engine> {
   try {
@@ -52,8 +53,12 @@ async function init() {
   // Initialize HUD
   const hud = new HUD();
 
+  // Initialize Sound Manager
+  const soundManager = new SoundManager();
+
   // Initialize Dialogue UI
   const dialogueUI = new DialogueUI();
+  dialogueUI.setSoundManager(soundManager);
 
   // Create NPC with dialogue
   const merchantNPC = new NPC(
@@ -91,6 +96,7 @@ async function init() {
 
   // Connect player attacks to combat system
   playerController.setAttackCallback((position, direction) => {
+    soundManager.play("attack");
     combatSystem.shootFireball(position, direction);
   });
 
