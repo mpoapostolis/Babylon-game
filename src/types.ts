@@ -30,6 +30,8 @@ export interface InputState {
   jump: boolean;
   run: boolean;
   attack: boolean;
+  interact: boolean;
+  cancel: boolean;
 }
 
 export interface MovementData {

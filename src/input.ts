@@ -26,6 +26,8 @@ export class InputManager {
       jump: this.inputMap[" "] || false,
       run: this.inputMap["shift"] || false,
       attack: this.inputMap["e"] || false,
+      interact: this.inputMap["f"] || false,
+      cancel: this.inputMap["escape"] || false,
     };
   }
 

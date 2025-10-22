@@ -5,6 +5,8 @@ import { PlayerController } from "./player";
 import { InputManager } from "./input";
 import { CombatSystem } from "./combat";
 import { HUD } from "./hud";
+import { NPC } from "./npc";
+import { DialogueUI } from "./dialogue";
 
 async function createEngine(canvas: HTMLCanvasElement): Promise<Engine> {
   try {
@@ -50,6 +52,43 @@ async function init() {
   // Initialize HUD
   const hud = new HUD();
 
+  // Initialize Dialogue UI
+  const dialogueUI = new DialogueUI();
+
+  // Create NPC with dialogue
+  const merchantNPC = new NPC(
+    scene,
+    new Vector3(5, 0, 0),
+    "Solaire",
+    [
+      {
+        speaker: "Solaire",
+        text: "Ah, hello there! I am Solaire of Astora, an adherent of the Lord of Sunlight.",
+      },
+      {
+        speaker: "Solaire",
+        text: "If only I could be so grossly incandescent! The sun is a wondrous body, like a magnificent father.",
+      },
+      {
+        speaker: "Solaire",
+        text: "We are amidst strange beings, in a strange land. The flow of time itself is convoluted, with heroes centuries old phasing in and out.",
+      },
+      {
+        speaker: "Solaire",
+        text: "Well then, take care. Neither of us want to see you go Hollow.",
+      },
+      {
+        speaker: "Solaire",
+        text: "If I didn't know better, I'd think you had feelings for me! Oh, no, dear me. Pretend you didn't hear that!",
+      },
+    ]
+  );
+
+  // Set up close callback for dialogue
+  dialogueUI.setCloseCallback(() => {
+    merchantNPC.resetDialogue();
+  });
+
   // Connect player attacks to combat system
   playerController.setAttackCallback((position, direction) => {
     combatSystem.shootFireball(position, direction);
@@ -91,12 +130,60 @@ async function init() {
     }
   };
 
+  // Track interaction state
+  let interactPressed = false;
+  let cancelPressed = false;
+
   // Main game loop
   scene.onBeforeRenderObservable.add(() => {
     const deltaTime = engine.getDeltaTime() / 1000;
     const input = inputManager.getInputState();
     playerController.update(deltaTime, input);
     combatSystem.update(deltaTime);
+
+    // Check NPC interaction
+    const playerPos = playerController.getCapsule().position;
+    const isNearNPC = merchantNPC.checkPlayerDistance(playerPos);
+
+    // Handle ESC key to close dialogue
+    if (input.cancel && !cancelPressed && dialogueUI.isShowing()) {
+      dialogueUI.hide();
+      merchantNPC.resetDialogue();
+      cancelPressed = true;
+    } else if (!input.cancel) {
+      cancelPressed = false;
+    }
+
+    // Show/hide interaction prompt
+    if (merchantNPC.isPlayerInRange() && !dialogueUI.isShowing()) {
+      dialogueUI.showPrompt(merchantNPC.getName());
+    } else if (!merchantNPC.isPlayerInRange()) {
+      dialogueUI.hidePrompt();
+    }
+
+    // Handle interaction input (F key)
+    if (input.interact && !interactPressed && merchantNPC.isPlayerInRange()) {
+      if (dialogueUI.isShowing()) {
+        // Continue dialogue
+        const nextLine = merchantNPC.interact();
+        if (nextLine) {
+          dialogueUI.show(nextLine);
+        } else {
+          dialogueUI.hide();
+          merchantNPC.resetDialogue();
+        }
+      } else {
+        // Start dialogue
+        const firstLine = merchantNPC.interact();
+        if (firstLine) {
+          dialogueUI.show(firstLine);
+          dialogueUI.hidePrompt();
+        }
+      }
+      interactPressed = true;
+    } else if (!input.interact) {
+      interactPressed = false;
+    }
 
     // Update HUD
     hud.updateHealth(playerController.getHealth(), playerController.getMaxHealth());

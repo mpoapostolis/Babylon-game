@@ -23,7 +23,7 @@ export const CONFIG = {
     INITIAL_BETA: Math.PI / 2.5,
     INITIAL_RADIUS: 8,
     MIN_RADIUS: 2,
-    MAX_RADIUS: 15,
+    MAX_RADIUS: 8,
     WHEEL_DELTA: 0.01,
     FOLLOW_SPEED: 0.1,
     OFFSET_Y: 1.5,
@@ -41,7 +41,7 @@ export const CONFIG = {
   },
 
   WORLD: {
-    DUNGEON_SCALE: 1.85,
+    DUNGEON_SCALE: 1.65,
     DUNGEON_POSITION: { x: 0, y: 0, z: -0 },
     STATIC_FRICTION: 0.5,
     STATIC_RESTITUTION: 0,
