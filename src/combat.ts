@@ -8,10 +8,24 @@ export class CombatSystem {
   private fireballs: Fireball[] = [];
   private enemies: Enemy[] = [];
   private player: PlayerController;
+  private selectedEnemy: Enemy | null = null;
 
   constructor(scene: Scene, player: PlayerController) {
     this.scene = scene;
     this.player = player;
+  }
+
+  setSelectedEnemy(enemy: Enemy | null): void {
+    // Deselect previous enemy
+    if (this.selectedEnemy) {
+      this.selectedEnemy.setSelected(false);
+    }
+
+    // Select new enemy
+    this.selectedEnemy = enemy;
+    if (this.selectedEnemy) {
+      this.selectedEnemy.setSelected(true);
+    }
   }
 
   shootFireball(position: Vector3, direction: Vector3): void {

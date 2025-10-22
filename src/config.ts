@@ -41,8 +41,8 @@ export const CONFIG = {
   },
 
   WORLD: {
-    DUNGEON_SCALE: 0.005,
-    DUNGEON_POSITION: { x: 13, y: 0, z: -39 },
+    DUNGEON_SCALE: 1.85,
+    DUNGEON_POSITION: { x: 0, y: 0, z: -0 },
     STATIC_FRICTION: 0.5,
     STATIC_RESTITUTION: 0,
   },

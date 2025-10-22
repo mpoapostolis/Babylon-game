@@ -8,6 +8,7 @@ import {
   PhysicsAggregate,
   PhysicsShapeType,
   DynamicTexture,
+  HighlightLayer,
   type AbstractMesh,
 } from "@babylonjs/core";
 
@@ -20,6 +21,7 @@ export class Enemy {
   private isDead = false;
   private hpBarPlane: AbstractMesh;
   private hpBarTexture: DynamicTexture;
+  private highlightLayer: HighlightLayer | null = null;
 
   constructor(scene: Scene, position: Vector3) {
     this.scene = scene;
@@ -175,6 +177,23 @@ export class Enemy {
 
   isAlive(): boolean {
     return !this.isDead;
+  }
+
+  setSelected(selected: boolean): void {
+    if (!this.highlightLayer) {
+      this.highlightLayer = this.scene.getHighlightLayerByName("highlight") as HighlightLayer;
+      if (!this.highlightLayer) {
+        this.highlightLayer = new HighlightLayer("highlight", this.scene);
+      }
+    }
+
+    if (selected) {
+      // Add yellow outline
+      this.highlightLayer.addMesh(this.mesh, Color3.Yellow());
+    } else {
+      // Remove outline
+      this.highlightLayer.removeMesh(this.mesh);
+    }
   }
 
   dispose(): void {

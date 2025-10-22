@@ -31,7 +31,7 @@ export async function createScene(engine: Engine): Promise<Scene> {
 }
 
 async function loadDungeon(scene: Scene): Promise<void> {
-  const result = await ImportMeshAsync("dungeon.glb", scene);
+  const result = await ImportMeshAsync("city.glb", scene);
   const rootMesh = result.meshes[0];
 
   // Apply transformations

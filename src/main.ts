@@ -66,6 +66,8 @@ async function init() {
         if (pickResult.pickedMesh === enemy.getMesh() || pickResult.pickedMesh.parent === enemy.getMesh()) {
           // Set target to enemy position
           playerController.setTarget(enemy.getPosition());
+          // Highlight selected enemy
+          combatSystem.setSelectedEnemy(enemy);
           console.log("Target set to enemy");
           break;
         }
