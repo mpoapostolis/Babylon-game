@@ -8,7 +8,196 @@
     <title>test-1</title>
   </head>
   <body class="overflow-hidden">
-    <canvas id="renderCanvas" class="h-screen w-screen"></canvas>
+    <canvas
+      id="renderCanvas"
+      class="h-screen w-screen absolute inset-0"
+    ></canvas>
+
+    <!-- Game HUD - Elden Ring Style -->
+    <div
+      id="hud"
+      class="absolute inset-0 pointer-events-none select-none"
+      style="font-family: 'Garamond', 'Georgia', serif"
+    >
+      <!-- BOTTOM LEFT - HEALTH & STAMINA -->
+      <div class="absolute top-8 left-8" style="width: 200px">
+        <!-- HP BAR -->
+        <div class="mb-2">
+          <div class="flex items-center gap-3 mb-1">
+            <div
+              class="text-amber-200/90 text-xs tracking-widest uppercase"
+              style="font-weight: 500; letter-spacing: 2px"
+            >
+              HP
+            </div>
+            <div
+              id="hp-text"
+              class="text-white/95 text-sm tabular-nums"
+              style="font-weight: 600"
+            >
+              100
+            </div>
+          </div>
+          <div
+            class="relative h-3 bg-black/40 overflow-hidden"
+            style="border: 1px solid rgba(139, 92, 46, 0.4)"
+          >
+            <div
+              id="hp-bar"
+              class="h-full transition-all duration-500 ease-out"
+              style="
+                width: 100%;
+                background: linear-gradient(to right, #dc2626 0%, #b91c1c 100%);
+              "
+            ></div>
+          </div>
+        </div>
+
+        <!-- FP/COOLDOWN BAR -->
+        <div
+          id="cooldown-container"
+          class="transition-opacity duration-300"
+          style="opacity: 0"
+        >
+          <div class="flex items-center gap-3 mb-1">
+            <div
+              class="text-sky-200/90 text-xs tracking-widest uppercase"
+              style="font-weight: 500; letter-spacing: 2px"
+            >
+              FP
+            </div>
+            <div
+              id="limit-text"
+              class="text-white/95 text-sm tabular-nums"
+              style="font-weight: 600"
+            >
+              0.0s
+            </div>
+          </div>
+          <div
+            class="relative h-3 bg-black/40 overflow-hidden"
+            style="border: 1px solid rgba(46, 92, 139, 0.4)"
+          >
+            <div
+              id="limit-bar"
+              class="h-full transition-all duration-100"
+              style="
+                width: 0%;
+                background: linear-gradient(to right, #0ea5e9 0%, #0284c7 100%);
+              "
+            ></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- BOTTOM RIGHT - ENEMY COUNT -->
+      <div class="absolute top-8 right-8 bg-black/30 p-4">
+        <div class="flex items-center gap-3">
+          <div
+            class="text-amber-200/80 text-xs tracking-widest uppercase"
+            style="font-weight: 500; letter-spacing: 2px"
+          >
+            Enemies
+          </div>
+          <div
+            id="enemy-count"
+            class="text-white/95 text-2xl tabular-nums"
+            style="font-weight: 600"
+          >
+            0
+          </div>
+        </div>
+      </div>
+
+      <!-- TARGET LOCK - TOP CENTER -->
+      <div
+        id="target-panel"
+        class="absolute top-4 left-1/2 -translate-x-1/2 hidden transition-all duration-300"
+      >
+        <div class="relative" style="width: 320px">
+          <div
+            class="bg-black/30 px-6 py-3 rounded-sm"
+            style="
+              backdrop-filter: blur(2px);
+              border: 1px solid rgba(139, 92, 46, 0.3);
+            "
+          >
+            <div class="flex items-center gap-3 mb-2">
+              <div
+                class="text-amber-200/90 text-xs tracking-widest uppercase"
+                style="font-weight: 500; letter-spacing: 2px"
+              >
+                Target
+              </div>
+              <div
+                id="target-hp-text"
+                class="text-white/95 text-sm tabular-nums"
+                style="font-weight: 600"
+              >
+                100
+              </div>
+            </div>
+            <div
+              class="relative h-3 bg-black/40 overflow-hidden"
+              style="border: 1px solid rgba(139, 92, 46, 0.4)"
+            >
+              <div
+                id="target-hp-bar"
+                class="h-full transition-all duration-500 ease-out"
+                style="
+                  width: 100%;
+                  background: linear-gradient(
+                    to right,
+                    #dc2626 0%,
+                    #b91c1c 100%
+                  );
+                "
+              ></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- MINIMAL CROSSHAIR -->
+      <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
+        <svg width="30" height="30" viewBox="0 0 30 30">
+          <circle cx="15" cy="15" r="1.5" fill="rgba(255, 255, 255, 0.7)" />
+          <line
+            x1="15"
+            y1="2"
+            x2="15"
+            y2="8"
+            stroke="rgba(255, 255, 255, 0.5)"
+            stroke-width="1.5"
+          />
+          <line
+            x1="15"
+            y1="22"
+            x2="15"
+            y2="28"
+            stroke="rgba(255, 255, 255, 0.5)"
+            stroke-width="1.5"
+          />
+          <line
+            x1="2"
+            y1="15"
+            x2="8"
+            y2="15"
+            stroke="rgba(255, 255, 255, 0.5)"
+            stroke-width="1.5"
+          />
+          <line
+            x1="22"
+            y1="15"
+            x2="28"
+            y2="15"
+            stroke="rgba(255, 255, 255, 0.5)"
+            stroke-width="1.5"
+          />
+        </svg>
+      </div>
+    </div>
+
     <script type="module" src="/src/main.ts"></script>
   </body>
 </html>

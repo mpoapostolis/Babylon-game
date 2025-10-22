@@ -90,6 +90,10 @@ export class CombatSystem {
     return this.enemies;
   }
 
+  getSelectedEnemy(): Enemy | null {
+    return this.selectedEnemy;
+  }
+
   dispose(): void {
     this.fireballs.forEach((f) => f.dispose());
     this.enemies.forEach((e) => e.dispose());

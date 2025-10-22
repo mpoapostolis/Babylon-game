@@ -179,6 +179,14 @@ export class Enemy {
     return !this.isDead;
   }
 
+  getHealth(): number {
+    return this.health;
+  }
+
+  getMaxHealth(): number {
+    return this.maxHealth;
+  }
+
   setSelected(selected: boolean): void {
     if (!this.highlightLayer) {
       this.highlightLayer = this.scene.getHighlightLayerByName("highlight") as HighlightLayer;

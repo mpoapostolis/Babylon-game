@@ -18,9 +18,14 @@ export class PlayerController {
   private scene: Scene;
   private camera: ArcRotateCamera;
   private currentAnim: AnimationGroup | null = null;
-  private attackCallback: ((position: Vector3, direction: Vector3) => void) | null = null;
+  private attackCallback:
+    | ((position: Vector3, direction: Vector3) => void)
+    | null = null;
   private attackCooldown = 0;
+  private maxAttackCooldown = 0.5;
   private targetPosition: Vector3 | null = null;
+  private health = 100;
+  private maxHealth = 100;
 
   // Reusable vectors for performance
   private readonly cameraForward = Vector3.Zero();
@@ -39,7 +44,9 @@ export class PlayerController {
     this.player = this.initializePlayer(playerMesh, animations);
   }
 
-  setAttackCallback(callback: (position: Vector3, direction: Vector3) => void): void {
+  setAttackCallback(
+    callback: (position: Vector3, direction: Vector3) => void
+  ): void {
     this.attackCallback = callback;
   }
 
@@ -144,7 +151,7 @@ export class PlayerController {
     // No target selected
     if (!this.targetPosition) return;
 
-    this.attackCooldown = 0.5; // Half second cooldown
+    this.attackCooldown = this.maxAttackCooldown;
 
     // Shoot position from chest height
     const shootPos = this.player.capsule.position.add(new Vector3(0, 0.8, 0));
@@ -157,13 +164,11 @@ export class PlayerController {
     if (attackAnim) {
       attackAnim.stop();
       attackAnim.start(false); // Play once
-
-      // Wait for animation to finish, then shoot fireball
-      attackAnim.onAnimationGroupEndObservable.addOnce(() => {
+      setTimeout(() => {
         if (this.attackCallback) {
           this.attackCallback(shootPos, direction);
         }
-      });
+      }, 500);
     } else {
       // No animation, shoot immediately
       if (this.attackCallback) {
@@ -321,6 +326,26 @@ export class PlayerController {
 
   getCapsule(): AbstractMesh {
     return this.player.capsule;
+  }
+
+  getHealth(): number {
+    return this.health;
+  }
+
+  getMaxHealth(): number {
+    return this.maxHealth;
+  }
+
+  getAttackCooldown(): number {
+    return this.attackCooldown;
+  }
+
+  getMaxAttackCooldown(): number {
+    return this.maxAttackCooldown;
+  }
+
+  takeDamage(amount: number): void {
+    this.health = Math.max(0, this.health - amount);
   }
 
   dispose(): void {

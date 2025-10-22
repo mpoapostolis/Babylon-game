@@ -4,6 +4,7 @@ import { createScene, createCamera, loadPlayerModel } from "./scene";
 import { PlayerController } from "./player";
 import { InputManager } from "./input";
 import { CombatSystem } from "./combat";
+import { HUD } from "./hud";
 
 async function createEngine(canvas: HTMLCanvasElement): Promise<Engine> {
   try {
@@ -46,16 +47,31 @@ async function init() {
   // Initialize combat system
   const combatSystem = new CombatSystem(scene, playerController);
 
+  // Initialize HUD
+  const hud = new HUD();
+
   // Connect player attacks to combat system
   playerController.setAttackCallback((position, direction) => {
     combatSystem.shootFireball(position, direction);
   });
 
-  // Spawn some test enemies
+  // Spawn enemies in a circle pattern
+  const enemyCount = 12;
+  const radius = 15;
+  for (let i = 0; i < enemyCount; i++) {
+    const angle = (i / enemyCount) * Math.PI * 2;
+    const x = Math.cos(angle) * radius;
+    const z = Math.sin(angle) * radius;
+    combatSystem.spawnEnemy(new Vector3(x, 1, z));
+  }
+
+  // Spawn some closer enemies
   combatSystem.spawnEnemy(new Vector3(5, 1, 5));
   combatSystem.spawnEnemy(new Vector3(-5, 1, 5));
   combatSystem.spawnEnemy(new Vector3(0, 1, 8));
   combatSystem.spawnEnemy(new Vector3(8, 1, -3));
+  combatSystem.spawnEnemy(new Vector3(-8, 1, -3));
+  combatSystem.spawnEnemy(new Vector3(4, 1, -6));
 
   // Click to target enemies
   scene.onPointerDown = (evt, pickResult) => {
@@ -81,6 +97,15 @@ async function init() {
     const input = inputManager.getInputState();
     playerController.update(deltaTime, input);
     combatSystem.update(deltaTime);
+
+    // Update HUD
+    hud.updateHealth(playerController.getHealth(), playerController.getMaxHealth());
+    hud.updateCooldown(
+      playerController.getAttackCooldown(),
+      playerController.getMaxAttackCooldown()
+    );
+    hud.updateTarget(combatSystem.getSelectedEnemy());
+    hud.updateEnemyCount(combatSystem.getEnemies().length);
   });
 
   // Start render loop
